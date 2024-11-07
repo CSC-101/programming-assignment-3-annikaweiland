@@ -1,16 +1,8 @@
 import data
 import build_data
-import unittest
-import hw3
+import county_demographics
+import hw3_tests
 
-
-# These two values are defined to support testing below. The
-# data within these structures should not be modified. Doing
-# so will affect later tests.
-#
-# The data is defined here for visibility purposes in the context
-# of this course.
-full_data = build_data.get_data()
 
 reduced_data = [
     data.CountyDemographics(
@@ -176,133 +168,109 @@ reduced_data = [
         'WY')
     ]
 
-class TestCases(unittest.TestCase):
-    pass
+#part1
+def population_total(input: list[data.CountyDemographics]) -> int:
+    population = 0
+    for county in input:
+        population = population + county.population['2014 Population']
+    return population
 
-    # Part 1
-    # test population_total
-    def test_population_total(self):
-        lista = build_data.get_data()
-        result = hw3.population_total(lista)
-        expected = 318857056
-        self.assertEqual(result, expected)
+#part2
+def filter_by_state(counties: list[data.CountyDemographics], input: str) -> list[data.CountyDemographics]:
+    in_state = []
+    for county in counties:
+        if county.state == input:
+            in_state.append(county)
+    if in_state != []:
+        return in_state
+    else:
+        return 'enter a valid state.'
 
-    def test_population_total_2(self):
-        listb = reduced_data
-        result = hw3.population_total(listb)
-        expected = 655813
-        self.assertEqual(result, expected)
 
-    # Part 2
-    # test filter_by_state
-    def test_filter_by_state(self):
-        lista = build_data.get_data()
-        result = len(hw3.filter_by_state(lista, "RI"))
-        expected = 5 #we know that there are 5 counties in RI, so based on our data, we should get length of 5 in a list
-        self.assertEqual(expected, result)
+#part3
+def population_by_education(counties: list[data.CountyDemographics], education: str) -> int:
+    #str HAS to be either 'Bachelor's Degree or higher' or 'High School or Higher'
+    sub_population = 0
+    try:
+        for county in counties:
+            sub_population = sub_population + county.population['2014 Population']*(county.education[education]/100)
+        return sub_population
+    except:
+        return "enter a valid education parameter."
 
-    def test_filter_by_state_2(self):
-        lista = build_data.get_data()
-        result = hw3.filter_by_state(lista, "AJ")
-        expected = 'enter a valid state.'
-        self.assertEqual(expected, result)
 
-    # Part 3
-    # test population_by_education
-    def test_population_by_education(self):
-        listb = build_data.get_data()
-        result = hw3.population_by_education(listb, "hello")
-        expected = 'enter a valid education parameter.'
-        self.assertEqual(result, expected)
+def population_by_ethnicity(counties: list[data.CountyDemographics], ethnicity: str) -> int:
+    #ethnicity HAS to be any of the keys - HOW TO MAKE IT JUST RETURN ZERO
+    sub_population = 0
+    try:
+        for county in counties:
+            sub_population = sub_population + county.population['2014 Population']*(county.ethnicities[ethnicity]/100)
+        return sub_population
+    except:
+        return "enter a valid ethnicity parameter."
 
-    def test_population_by_education_2(self):
-        listb = reduced_data
-        result = hw3.population_by_education(listb, "High School or Higher")
-        expected = 56656396.8
-        self.assertEqual(result, expected)
+def population_below_poverty_level(counties: list[data.CountyDemographics]) -> int:
+    ppl_below = 0
+    for county in counties:
+        ppl_below = ppl_below + county.population['2014 Population']*(county.income['Persons Below Poverty Level']/100)
+    return ppl_below
 
-    # test population_by_ethnicity
 
-    def test_population_by_ethnicity(self):
-        listb = reduced_data
-        result = hw3.population_by_ethnicity(listb, "Black Alone")
-        expected = 2520484.4
-        self.assertEqual(result, expected)
+#part4
+def percent_by_education(counties: list[data.CountyDemographics], key:str) -> float:
+    try:
+        population = population_total(counties)
+        edulvl = population_by_education(counties, key)
+        percentage = (edulvl/population)*100
+        return percentage
+    except:
+        return "enter a valid education parameter"
 
-    def test_population_by_ethnictiy_2(self):
-        listb = reduced_data
-        result = hw3.population_by_ethnicity(listb, "White Alone")
-        expected = 55413785.7
-        self.assertEqual(expected, result)
-
-    # test population_below_poverty_level
-
-    def test_population_below_poverty_level(self):
-        result = hw3.population_total(reduced_data)
-        expected = 655813
-        self.assertEqual(result, expected)
-
-    def test_population_below_poverty_level_2(self):
-        result = hw3.population_below_poverty_level(build_data.get_data())
-        expected = 4899648847.400001
-        self.assertEqual(result, expected)
-##FIX ABOVE
-    # Part 4
-    # test percent_by_education
-
-    def test_percent_by_education(self):
-        result = hw3.percent_by_education(reduced_data, "High School or Higher")
-        expected =  86.3910852636346078
-        self.assertAlmostEqual(result, expected)
-
-    def test_percent_by_education_2(self):
-        result = hw3.percent_by_education(reduced_data, "Bachelor's Degree or Higher")
-        expected = 29.751482663503165
-        self.assertAlmostEqual(result, expected)
-
-    # test percent_by_ethnicity
-
-    def test_percent_by_ethnicity(self):
-        result = hw3.percent_by_ethnicity(reduced_data, "Black Alone")
-        expected = 3.84329740337
-        self.assertAlmostEqual(result, expected)
-
-    def test_percent_by_ethnicity_2(self):
-        result = hw3.percent_by_ethnicity(reduced_data, "Asian Alone")
-        expected = 6.27942965448
-        self.assertAlmostEqual(result, expected)
-
-    # test percent_below_poverty_level
-
-    def test_percent_below_poverty_level(self):
-        result = hw3.percent_below_poverty_level(reduced_data)
-        expected = 16.4241504819
-        self.assertAlmostEqual(result, expected)
-
-    def test_percent_below_poverty_level_2(self):
-        result = hw3.percent_below_poverty_level(build_data.get_data())
-        expected = 15.36628641
-        self.assertAlmostEqual(result, expected)
-
-    # Part 5
-    # test education_greater_than
-    def test_education_greater_than(self):
-        result = len(hw3.education_greater_than(reduced_data, "Bachelor's Degree or Higher", 40))
-        expected = 0
-        self.assertEqual(result, expected)
-
-    def test_education_greater_than_2(self):
-        result = len(hw3.education_greater_than(reduced_data, "Bachelor's Degree or Higher", 12))
-        expected = 7
-        self.assertEqual(result, expected)
-
-    # test education_less_than
-    # test ethnicity_greater_than
-    # test ethnicity_less_than
-    # test below_poverty_level_greater_than
-    # test below_poverty_level_less_than
+def percent_by_ethnicity(counties: list[data.CountyDemographics], key:str) -> float:
+    try:
+        population = population_total(counties)
+        ethlvl = population_by_ethnicity(counties, key)
+        percentage = (ethlvl/population)*100
+        return percentage
+    except:
+        return "enter a valid ethnicity parameter"
 
 
 
-if __name__ == '__main__':
-    unittest.main()
+def percent_below_poverty_level(counties: list[data.CountyDemographics]) -> float:
+    population = population_total(counties)
+    povlvl = population_below_poverty_level(counties)
+    percentage = (povlvl/population)*100
+    return percentage
+
+#part5
+def education_greater_than(counties: list[data.CountyDemographics], key: str, value: float) -> list[data.CountyDemographics]:
+    greater_than = []
+    for county in counties:
+        if county.education[key] > value:
+            greater_than.append(county)
+    return greater_than
+
+def education_less_than(counties: list[data.CountyDemographics], key: str, value: float) -> list[data.CountyDemographics]:
+    less_than = []
+    for county in counties:
+        if county.education[key] < value:
+            less_than.append(county)
+    return less_than
+
+def ethnicity_greater_than()
+
+def ethnicity_less_than()
+
+def below_poverty_level_greater_than(counties: list[data.CountyDemographics], value: float) -> list[data.CountyDemographics]:
+    greater_than = []
+    for county in counties:
+        if county.income['Persons Below Poverty Level'] < value:
+            greater_than.append(county)
+    return greater_than
+
+def below_poverty_level_greater_than()
+
+def below_poverty_level_less_than()
+
+
