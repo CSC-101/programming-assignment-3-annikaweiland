@@ -150,6 +150,7 @@ def below_poverty_level_greater_than(counties: list[data.CountyDemographics], va
             greater_than.append(county)
     return greater_than
 
+
 #Purpose: Determining the counties that have a smaller population of "below poverty level" than a given threshold value.
 #inputs: A list of counties (list of type CountyDemographics) and a threshold value.
 #outputs: A list of counties that below poverty level percentage is lower than the threshold value.
